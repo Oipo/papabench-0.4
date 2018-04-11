@@ -10,3 +10,5 @@ add_executable(autopilot main.c modem.c link_fbw.c spi.c adc.c infrared.c pid.c
                          nav.c uart.c estimator.c if_calib.c mainloop.c
                          gps_ubx.c
                          ${CMAKE_SOURCE_DIR}/sw/lib/c/math.c)
+
+set_target_properties(autopilot PROPERTIES LINK_FLAGS "-static" )
