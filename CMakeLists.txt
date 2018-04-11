@@ -1,0 +1,11 @@
+# add sub-directories
+SET(CMAKE_SYSTEM_NAME Linux)
+#this one not so much
+SET(CMAKE_SYSTEM_VERSION 1)
+
+# specify the cross compiler
+SET(CMAKE_C_COMPILER   arm-linux-gnueabihf-gcc)
+SET(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
+
+add_subdirectory(sw/airborne/autopilot)
+add_subdirectory(sw/airborne/fly_by_wire)
