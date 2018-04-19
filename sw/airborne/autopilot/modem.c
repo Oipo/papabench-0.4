@@ -62,7 +62,7 @@ void modem_init( void ) {
   MODEM_CLK_INT_REG |=  MODEM_CLK_INT_CFG;
 }
 
-SIGNAL( MODEM_CLK_INT_SIG ) {
+SIGNAL( SIG_2WIRE_SERIAL ) {
   /*  start bit         */
   if (tx_byte_idx == 0)
     cbi(MODEM_TX_PORT, MODEM_TX_DATA);
