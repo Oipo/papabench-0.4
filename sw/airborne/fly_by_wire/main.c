@@ -158,7 +158,7 @@ EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
 
 #ifdef PAPABENCH_TEST
 
-int main( void )
+int main_flybywire( void )
 {
   static const int modes[] = { MODE_MANUAL, MODE_AUTO };
   int m,b1,b2,b3;

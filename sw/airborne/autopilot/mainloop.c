@@ -112,7 +112,7 @@ int main( void )
 }
 
 #else
-int main( void ) 
+int main_autopilot( void )
 {
   uint8_t init_cpt;
 
