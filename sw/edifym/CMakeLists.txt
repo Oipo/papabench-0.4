@@ -1,2 +1,2 @@
 
-add_library(libtest STATIC libtest.c)
+add_library(test STATIC libtest.c)
