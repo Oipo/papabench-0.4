@@ -23,6 +23,7 @@
  */
 #include <avr/interrupt.h>
 #include "std.h"
+#include <stdio.h>
 
 #include "timer.h"
 #include "modem.h"
@@ -49,7 +50,7 @@ EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
 #ifdef PAPABENCH_TEST
 
 extern bool_t low_battery;
-int main( void )
+int main_autopilot( void )
 {
   uint8_t init_cpt;
 
@@ -66,6 +67,7 @@ int main( void )
   nav_init();
   ir_init();
   estimator_init();
+  printf("autopilot\n");
   int m1,m2;
   int b1,b2,b3;
   for(m1 = 0; m1 < 5; m1++)

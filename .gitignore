@@ -3,3 +3,6 @@ CMakeFiles/
 cmake_install.cmake
 .idea
 cmake-build-debug
+*.o
+*.a
+Makefile

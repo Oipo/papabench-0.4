@@ -26,6 +26,7 @@
 #include <avr/io.h>
 #include <avr/signal.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
 
 #include "timer.h"
 #include "servo.h"
@@ -164,6 +165,7 @@ int main_flybywire( void )
   int m,b1,b2,b3;
 
   fbw_init();
+  printf("flybywire\n");
   for(m = 0; m < 2; m++) {
     /* T1: check_failsafe_task */
     for(b1 = 0; b1 <= 1; b1++)
@@ -210,7 +212,7 @@ int main_flybywire( void )
 
 #else
 
-int main( void )
+int main_flybywire( void )
 {
 
   fbw_init();
