@@ -9,3 +9,4 @@ SET(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
 
 add_subdirectory(sw/airborne/autopilot)
 add_subdirectory(sw/airborne/fly_by_wire)
+add_subdirectory(sw/edifym)
