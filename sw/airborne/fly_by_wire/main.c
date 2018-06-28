@@ -27,6 +27,7 @@
 #include <avr/signal.h>
 #include <avr/interrupt.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "timer.h"
 #include "servo.h"
@@ -159,6 +160,25 @@ EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
 
 #ifdef PAPABENCH_TEST
 
+int max_m;
+
+int init_flybywire(int count, ...) {
+    va_list ap;
+
+    if(count != 1) {
+        printf("Horrible disaster for init_flybywire, expected 1 argument got %i\n", count);
+        return -1;
+    }
+
+    va_start(ap, count);
+
+    max_m = va_arg(ap, int);
+
+    va_end(ap);
+
+    return 0;
+}
+
 int main_flybywire( void )
 {
   static const int modes[] = { MODE_MANUAL, MODE_AUTO };
@@ -166,7 +186,7 @@ int main_flybywire( void )
 
   fbw_init();
   printf("flybywire\n");
-  for(m = 0; m < 2; m++) {
+  for(m = 0; m < max_m; m++) {
     /* T1: check_failsafe_task */
     for(b1 = 0; b1 <= 1; b1++)
       for(b2 = 0; b2 <= 2; b2++) {

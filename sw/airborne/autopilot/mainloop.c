@@ -24,6 +24,7 @@
 #include <avr/interrupt.h>
 #include "std.h"
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "timer.h"
 #include "modem.h"
@@ -49,6 +50,25 @@ EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
 
 #ifdef PAPABENCH_TEST
 
+int max_m1;
+
+int init_autopilot(int count, ...) {
+  va_list ap;
+
+  if(count != 1) {
+    printf("Horrible disaster for init_flybywire, expected 1 argument got %i\n", count);
+    return -1;
+  }
+
+  va_start(ap, count);
+
+  max_m1 = va_arg(ap, int);
+
+  va_end(ap);
+
+  return 0;
+}
+
 extern bool_t low_battery;
 int main_autopilot( void )
 {
@@ -70,7 +90,7 @@ int main_autopilot( void )
   printf("autopilot\n");
   int m1,m2;
   int b1,b2,b3;
-  for(m1 = 0; m1 < 5; m1++)
+  for(m1 = 0; m1 < max_m1; m1++)
     for(m2 = 0; m2 < 5; m2++) {
       pprz_mode = m1;
       vertical_mode = m2;

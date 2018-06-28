@@ -66,7 +66,7 @@ SIGNAL( SIG_2WIRE_SERIAL ) {
   /*  start bit         */
   if (tx_byte_idx == 0)
     cbi(MODEM_TX_PORT, MODEM_TX_DATA);
-  /* 8 data bits        */ 
+  /* 8 data bits        */
   else if (tx_byte_idx < 9) {
     if (tx_byte & 0x01)
       sbi(MODEM_TX_PORT, MODEM_TX_DATA);
@@ -76,7 +76,7 @@ SIGNAL( SIG_2WIRE_SERIAL ) {
   }
   /* stop_bit           */
   else {
-    sbi(MODEM_TX_PORT, MODEM_TX_DATA); 
+    sbi(MODEM_TX_PORT, MODEM_TX_DATA);
   }
   tx_byte_idx++;
   /* next byte          */
@@ -87,7 +87,7 @@ SIGNAL( SIG_2WIRE_SERIAL ) {
       cbi( EIMSK, MODEM_CLK_INT );
     } else {
       /* else load next byte                  */
-      MODEM_LOAD_NEXT_BYTE();  
+      MODEM_LOAD_NEXT_BYTE();
     }
   }
 }
