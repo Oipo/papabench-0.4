@@ -48,9 +48,9 @@
 
 uint16_t		adc_samples[ NB_ADC ];
 
-static struct adc_buf* buffers[NB_ADC];
+static struct adc_fbw_buf* buffers[NB_ADC];
 
-void fbw_adc_buf_channel(uint8_t adc_channel, struct adc_buf* s) {
+void fbw_adc_buf_channel(uint8_t adc_channel, struct adc_fbw_buf* s) {
   buffers[adc_channel] = s;
 }
 
@@ -74,7 +74,7 @@ fbw_adc_init( void )
 
   /* Init to 0 (usefull ?) */
   for(i = 0; i < NB_ADC; i++)
-    buffers[i] = (struct adc_buf*)0;
+    buffers[i] = (struct adc_fbw_buf*)0;
 }
 
 /**
@@ -86,7 +86,7 @@ fbw_adc_init( void )
 SIGNAL( SIG_ADC )
 {
   uint8_t adc_input	= ADMUX & 0x7;
-  struct adc_buf* buf = buffers[adc_input];
+  struct adc_fbw_buf* buf = buffers[adc_input];
   uint16_t adc_value = ADCW;
   /* Store result */
   adc_samples[ adc_input ] = adc_value;

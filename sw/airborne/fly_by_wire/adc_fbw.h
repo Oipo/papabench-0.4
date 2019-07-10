@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef _ADC_H_
-#define _ADC_H_
+#ifndef _ADC_FBW_H_
+#define _ADC_FBW_H_
 
 #include "airframe.h"
 
@@ -44,7 +44,7 @@ void fbw_adc_init( void );
 
 #define AV_NB_SAMPLE 0x20
 
-struct adc_buf {
+struct adc_fbw_buf {
   uint16_t sum;
   uint16_t values[AV_NB_SAMPLE];
   uint8_t  head;
@@ -54,9 +54,9 @@ struct adc_buf {
 /* Facility to store last values in a circular buffer for a specific
    channel: allocate a (struct adc_buf) and register it with the following
    function */
-void fbw_adc_buf_channel(uint8_t adc_channel, struct adc_buf* s);
+void fbw_adc_buf_channel(uint8_t adc_channel, struct adc_fbw_buf* s);
 
 
 #endif /* CTL_BRD_V1_2 || CTL_BRD_V1_2 */
 
-#endif /* _ADC_H_      */
+#endif /* _ADC_FBW_H_      */

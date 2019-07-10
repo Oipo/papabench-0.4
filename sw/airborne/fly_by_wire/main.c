@@ -26,8 +26,8 @@
 #include <avr/io.h>
 #include <avr/signal.h>
 #include <avr/interrupt.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "timer.h"
 #include "servo.h"
@@ -42,8 +42,8 @@
 
 #ifndef CTL_BRD_V1_1
 #include "adc_fbw.h"
-struct adc_buf vsupply_adc_buf;
-struct adc_buf vservos_adc_buf;
+struct adc_fbw_buf vsupply_adc_buf;
+struct adc_fbw_buf vservos_adc_buf;
 #endif
 
 uint8_t mode;
@@ -98,6 +98,26 @@ static void to_autopilot_from_last_radio (void) {
 #endif
 }
 
+int init_send_data_to_autopilot_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 4) {
+        printf("Horrible disaster for init_send_data_to_autopilot_task, expected 4 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    mode = va_arg(ap, int);
+    SPI_PIN = va_arg(ap, int) == 1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
+    spi_was_interrupted = va_arg(ap, int) == 1 ? TRUE : FALSE;
+    last_radio_contains_avg_channels = va_arg(ap, int) == 1 ? TRUE : FALSE;
+
+    va_end(ap);
+
+    return 0;
+}
+
 __attribute__((noinline))
 void send_data_to_autopilot_task(void)
 {
@@ -117,21 +137,19 @@ void send_data_to_autopilot_task(void)
 	static uint8_t _20Hz;
 #endif
 
-void fbw_spi_init(void);
-
 void fbw_init(void) {
-  uart_init_tx();
+  uart_init_tx(); // only here
   uart_print_string((uint8_t*)"FBW Booting $Id: main.c,v 1.3 2008/10/22 19:41:19 casse Exp $\n");
 
 #ifndef CTL_BRD_V1_1
-  fbw_adc_init();
+  fbw_adc_init(); // only here
   fbw_adc_buf_channel(3, &vsupply_adc_buf);
   fbw_adc_buf_channel(6, &vservos_adc_buf);
 #endif
-  timer_init();
-  servo_init();
-  ppm_init();
-  fbw_spi_init();
+  timer_init(); // same in both
+  servo_init(); // only here
+  ppm_init(); // only here
+  fbw_spi_init(); // only here
   //sei(); //FN
 }
 
@@ -160,33 +178,13 @@ EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
 
 #ifdef PAPABENCH_TEST
 
-int max_m;
-
-int init_flybywire(int count, ...) {
-    va_list ap;
-
-    if(count != 1) {
-        printf("Horrible disaster for init_flybywire, expected 1 argument got %i\n", count);
-        return -1;
-    }
-
-    va_start(ap, count);
-
-    max_m = va_arg(ap, int);
-
-    va_end(ap);
-
-    return 0;
-}
-
 int main_flybywire( void )
 {
   static const int modes[] = { MODE_MANUAL, MODE_AUTO };
   int m,b1,b2,b3;
 
   fbw_init();
-  printf("flybywire\n");
-  for(m = 0; m < max_m; m++) {
+  for(m = 0; m < 2; m++) {
     /* T1: check_failsafe_task */
     for(b1 = 0; b1 <= 1; b1++)
       for(b2 = 0; b2 <= 2; b2++) {
@@ -260,6 +258,26 @@ int main_flybywire( void )
 
 #endif
 
+int init_test_ppm_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 4) {
+        printf("Horrible disaster for init_test_ppm_task, expected 4 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    mode = va_arg(ap, int);
+    ppm_valid = va_arg(ap, int) == 1 ? TRUE : FALSE;
+    spi_was_interrupted = va_arg(ap, int) == 1 ? TRUE : FALSE;
+    last_radio_contains_avg_channels = va_arg(ap, int) == 1 ? TRUE : FALSE;
+
+    va_end(ap);
+
+    return 0;
+}
+
 __attribute__((noinline))
 void test_ppm_task(void)
 {
@@ -294,6 +312,29 @@ void test_ppm_task(void)
     }
 }
 
+int init_check_failsafe_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 1) {
+        printf("Horrible disaster for init_check_failsafe_task, expected 1 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    if(va_arg(ap, int) == 1) {
+        mode = MODE_MANUAL;
+        radio_ok = FALSE;
+    } else {
+        mode = MODE_MANUAL;
+        radio_ok = TRUE;
+    }
+
+    va_end(ap);
+
+    return 0;
+}
+
 __attribute__((noinline))
 void check_failsafe_task(void)
 {
@@ -302,6 +343,26 @@ void check_failsafe_task(void)
     {
       servo_set(failsafe);
     }
+}
+
+int init_check_mega128_values_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 4) {
+        printf("Horrible disaster for init_check_mega128_values_task, expected 4 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    mode = va_arg(ap, int);
+    SPI_PIN = va_arg(ap, int) == 1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
+    spi_was_interrupted = va_arg(ap, int) == 1 ? TRUE : FALSE;
+    mega128_receive_valid = va_arg(ap, int) == 1 ? TRUE : FALSE;
+
+    va_end(ap);
+
+    return 0;
 }
 
 __attribute__((noinline))

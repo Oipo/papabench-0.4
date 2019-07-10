@@ -23,8 +23,6 @@
  */
 #include <avr/interrupt.h>
 #include "std.h"
-#include <stdio.h>
-#include <stdarg.h>
 
 #include "timer.h"
 #include "modem.h"
@@ -39,6 +37,21 @@
 #include "estimator.h"
 #include "downlink.h"
 
+#include "../fly_by_wire/timer.h"
+#include "../fly_by_wire/servo.h"
+#include "../fly_by_wire/ppm.h"
+#include "../fly_by_wire/spi.h"
+#include "../fly_by_wire/link_autopilot.h"
+
+
+#include "../fly_by_wire/uart.h"
+
+#ifndef CTL_BRD_V1_1
+#include "adc_fbw.h"
+extern struct adc_fbw_buf vsupply_adc_buf;
+extern struct adc_fbw_buf vservos_adc_buf;
+#endif
+
 #ifndef PAPABENCH_SINGLE
 	void fbw_init(void);
 	void fbw_schedule(void);
@@ -48,26 +61,32 @@
 EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
 #endif
 
-#ifdef PAPABENCH_TEST
+void program_init(void) {
+    timer_init();
+    modem_init();
+    adc_init();
+    spi_init();
+    link_fbw_init();
+    gps_init();
+    nav_init();
+    ir_init();
+    estimator_init();
 
-int max_m1;
+    uart_init_tx();
+    uart_print_string((uint8_t*)"FBW Booting $Id: main.c,v 1.3 2008/10/22 19:41:19 casse Exp $\n");
 
-int init_autopilot(int count, ...) {
-  va_list ap;
+#ifndef CTL_BRD_V1_1
+    fbw_adc_init();
+    fbw_adc_buf_channel(3, &vsupply_adc_buf);
+    fbw_adc_buf_channel(6, &vservos_adc_buf);
+#endif
 
-  if(count != 1) {
-    printf("Horrible disaster for init_flybywire, expected 1 argument got %i\n", count);
-    return -1;
-  }
-
-  va_start(ap, count);
-
-  max_m1 = va_arg(ap, int);
-
-  va_end(ap);
-
-  return 0;
+    servo_init();
+    ppm_init();
+    fbw_spi_init();
 }
+
+#ifdef PAPABENCH_TEST
 
 extern bool_t low_battery;
 int main_autopilot( void )
@@ -87,13 +106,13 @@ int main_autopilot( void )
   nav_init();
   ir_init();
   estimator_init();
-  printf("autopilot\n");
   int m1,m2;
   int b1,b2,b3;
-  for(m1 = 0; m1 < max_m1; m1++)
+  for(m1 = 0; m1 < 5; m1++)
     for(m2 = 0; m2 < 5; m2++) {
       pprz_mode = m1;
       vertical_mode = m2;
+      // T11:
       altitude_control_task();
     }
   for(m1 = 0; m1 < 5; m1++)
@@ -106,16 +125,19 @@ int main_autopilot( void )
             low_battery = b1;
             estimator_flight_time = b2;
             launch = b3;
+            // T12:
             climb_control_task();
           }
   for(m1 = 0; m1 < 3; m1++) {
     spi_cur_slave = m1;
+    // T8:
     link_fbw_send();
   }
   for(m1 = 0; m1 < 5; m1++)
     for(m2 = 0; m2 < 5; m2++) {
       pprz_mode = m1;
       vertical_mode = m2;
+      // T10:
       navigation_task();
     }
 
@@ -125,9 +147,13 @@ int main_autopilot( void )
   course_run();
   */
 
+  // T6:
   radio_control_task();
+  // T9:
   receive_gps_data_task();
+  // T13:
   reporting_task();
+  // T7:
   stabilisation_task();
 
   return 0;

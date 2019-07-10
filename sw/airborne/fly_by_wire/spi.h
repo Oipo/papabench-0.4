@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef SPI_H
-#define SPI_H
+#ifndef SPI_FBW_H
+#define SPI_FBW_H
 
 #include "link_autopilot.h"
 
@@ -41,8 +41,8 @@ extern volatile bool_t mega128_receive_valid;
 extern volatile bool_t spi_was_interrupted;
 
 
-void spi_init(void);
+void fbw_spi_init(void);
 void spi_reset(void);
 
 
-#endif /* SPI_H */
+#endif /* SPI_FBW_H */

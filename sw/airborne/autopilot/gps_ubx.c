@@ -79,7 +79,8 @@ volatile int16_t simul_ir_pitch;
 static uint8_t  ubx_status;
 static uint16_t ubx_len;
 static uint8_t  ubx_msg_idx;
-static uint8_t ck_a, ck_b, ubx_id, ubx_class;
+static uint8_t ck_a, ck_b;
+uint8_t ubx_id, ubx_class;
 
 void gps_init( void ) {
   /* Enable uart                   */

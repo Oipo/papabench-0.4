@@ -27,6 +27,8 @@
  */
 #include <inttypes.h>
 #include <math.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include "link_autopilot.h"
 
@@ -332,6 +334,26 @@ uint8_t inflight_calib_mode_update ( void ) {
   ModeUpdate(inflight_calib_mode, IF_CALIB_MODE_OF_PULSE(from_fbw.channels[RADIO_CALIB]));
 }
 
+int init_radio_control_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 5) {
+        printf("Horrible disaster for init_radio_control_task, expected 5 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    link_fbw_receive_valid = va_arg(ap, int);
+    pprz_mode = va_arg(ap, int);
+    from_fbw.status = va_arg(ap, int);
+    too_far_from_home = va_arg(ap, int) == 1 ? TRUE : FALSE;
+    estimator_flight_time = va_arg(ap, int);
+
+    va_end(ap);
+
+    return 0;
+}
 
 /** \fn inline void radio_control_task( void )
  *  \brief @@@@@ A FIXER @@@@@
@@ -417,6 +439,31 @@ void course_run(void){
     desired_roll = nav_desired_roll;
   }  
 }
+
+int init_altitude_control_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 1) {
+        printf("Horrible disaster for init_altitude_control_task, expected 1 argument got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    int enable = va_arg(ap, int);
+    if(enable == 1) {
+        pprz_mode = PPRZ_MODE_AUTO2;
+        vertical_mode = VERTICAL_MODE_AUTO_ALT;
+    } else {
+        pprz_mode = PPRZ_MODE_MANUAL;
+        vertical_mode = VERTICAL_MODE_MANUAL;
+    }
+
+    va_end(ap);
+
+    return 0;
+}
+
 __attribute__((noinline))
 void altitude_control_task(void)
 {
@@ -425,6 +472,28 @@ void altitude_control_task(void)
       			altitude_pid_run();
 	}
 }
+
+int init_climb_control_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 5) {
+        printf("Horrible disaster for init_climb_control_task, expected 5 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    pprz_mode = va_arg(ap, int);
+    vertical_mode = va_arg(ap, int);
+    low_battery = va_arg(ap, int) == 1 ? TRUE : FALSE;
+    estimator_flight_time = va_arg(ap, int);
+    launch = va_arg(ap, int) == 1 ? TRUE : FALSE;
+
+    va_end(ap);
+
+    return 0;
+}
+
 __attribute__((noinline))
 void climb_control_task(void)
 {
@@ -469,6 +538,24 @@ void climb_control_task(void)
 	static uint8_t _20Hz   = 0;
 	static uint8_t _1Hz   = 0;
 #endif
+
+int init_navigation_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 2) {
+        printf("Horrible disaster for init_navigation_task, expected 2 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    pprz_mode = va_arg(ap, int);
+    vertical_mode = va_arg(ap, int);
+
+    va_end(ap);
+
+    return 0;
+}
 
 __attribute__((noinline))
 void navigation_task( void ) {
@@ -579,6 +666,23 @@ else
 //#endif
 }
 
+int init_stabilisation_task(int arg_count, ...) {
+    va_list ap;
+
+    if(arg_count != 1) {
+        printf("Horrible disaster for init_stabilisation_task, expected 1 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    ir_estim_mode = va_arg(ap, int);
+
+    va_end(ap);
+
+    return 0;
+}
+
 __attribute__((noinline))
 void stabilisation_task(void)
 {
@@ -593,6 +697,29 @@ void stabilisation_task(void)
     
     // Code for camera stabilization, FIXME put that elsewhere
     to_fbw.channels[RADIO_GAIN1] = TRIM_PPRZ(MAX_PPRZ/0.75*(-estimator_phi));
+}
+
+int init_receive_gps_data_task(int arg_count, ...) {
+    extern uint8_t ubx_id, ubx_class;
+    va_list ap;
+
+    if(arg_count != 6) {
+        printf("Horrible disaster for init_receive_gps_data_task, expected 6 arguments got %i\n", arg_count);
+        return -1;
+    }
+
+    va_start(ap, arg_count);
+
+    ubx_class = va_arg(ap, int);
+    ubx_id = va_arg(ap, int);
+    gps_mode = va_arg(ap, int);
+    gps_pos_available = va_arg(ap, int) == 1 ? TRUE : FALSE;
+    estimator_flight_time = va_arg(ap, double);
+    estimator_hspeed_mod = va_arg(ap, double);
+
+    va_end(ap);
+
+    return 0;
 }
 
 __attribute__((noinline))
