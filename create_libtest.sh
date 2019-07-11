@@ -1,4 +1,5 @@
 #!/bin/bash
+rm sw/libtest.a
 cd sw/airborne/autopilot
 aarch64-linux-gnu-ar -x libautopilot.a 
 cd -
