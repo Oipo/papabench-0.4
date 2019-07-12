@@ -2,45 +2,45 @@ void program_init(void);
 
 // autopilot tasks
 void altitude_control_task(void);
-int init_altitude_control_task(int arg_count, ...);
+int init_altitude_control_task(int arg_count, int *task_args);
 
 void climb_control_task(void);
-int init_climb_control_task(int arg_count, ...);
+int init_climb_control_task(int arg_count, int *task_args);
 
 void link_fbw_send(void);
-int init_link_fbw_send(int arg_count, ...);
+int init_link_fbw_send(int arg_count, int *task_args);
 
 void navigation_task( void );
-int init_navigation_task(int arg_count, ...);
+int init_navigation_task(int arg_count, int *task_args);
 
 void radio_control_task(void);
-int init_radio_control_task(int arg_count, ...);
+int init_radio_control_task(int arg_count, int *task_args);
 
 void receive_gps_data_task(void);
-int init_receive_gps_data_task(int arg_count, ...);
+int init_receive_gps_data_task(int arg_count, int *task_args);
 
 void reporting_task(void);
 
 void stabilisation_task(void);
-int init_stabilisation_task(int arg_count, ...);
+int init_stabilisation_task(int arg_count, int *task_args);
 
 // fly by wire tasks
 void check_failsafe_task(void);
-int init_check_failsafe_task(int arg_count, ...);
+int init_check_failsafe_task(int arg_count, int *task_args);
 
 void check_mega128_values_task(void);
-int init_check_mega128_values_task(int arg_count, ...);
+int init_check_mega128_values_task(int arg_count, int *task_args);
 
 void send_data_to_autopilot_task(void);
-int init_send_data_to_autopilot_task(int arg_count, ...);
+int init_send_data_to_autopilot_task(int arg_count, int *task_args);
 
 void servo_transmit(void);
 
 void test_ppm_task(void);
-int init_test_ppm_task(int arg_count, ...);
+int init_test_ppm_task(int arg_count, int *task_args);
 
 typedef void (*functionPtr)();
-typedef int (*initFunctionPtr)(int count, ...);
+typedef int (*initFunctionPtr)(int count, int *task_args);
 
 typedef struct task {
     char *name;

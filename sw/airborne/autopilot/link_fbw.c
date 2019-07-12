@@ -25,7 +25,6 @@
 #include <avr/io.h>
 #include <avr/signal.h>
 #include <avr/interrupt.h>
-#include <stdarg.h>
 #include <stdio.h>
 
 #include "link_fbw.h"
@@ -46,19 +45,13 @@ void link_fbw_init(void) {
   link_fbw_receive_complete = FALSE;  
 }
 
-int init_link_fbw_send(int arg_count, ...) {
-    va_list ap;
-
+int init_link_fbw_send(int arg_count, int *task_args) {
     if(arg_count != 1) {
         printf("Horrible disaster for init_link_fbw_send, expected 1 argument got %i\n", arg_count);
         return -1;
     }
 
-    va_start(ap, arg_count);
-
-    spi_cur_slave = va_arg(ap, int);
-
-    va_end(ap);
+    spi_cur_slave = task_args[0];
 
     return 0;
 }

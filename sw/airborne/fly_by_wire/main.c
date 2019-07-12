@@ -26,7 +26,6 @@
 #include <avr/io.h>
 #include <avr/signal.h>
 #include <avr/interrupt.h>
-#include <stdarg.h>
 #include <stdio.h>
 
 #include "timer.h"
@@ -98,22 +97,16 @@ static void to_autopilot_from_last_radio (void) {
 #endif
 }
 
-int init_send_data_to_autopilot_task(int arg_count, ...) {
-    va_list ap;
-
+int init_send_data_to_autopilot_task(int arg_count, int *task_args) {
     if(arg_count != 4) {
         printf("Horrible disaster for init_send_data_to_autopilot_task, expected 4 arguments got %i\n", arg_count);
         return -1;
     }
 
-    va_start(ap, arg_count);
-
-    mode = va_arg(ap, int);
-    SPI_PIN = va_arg(ap, int) == 1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
-    spi_was_interrupted = va_arg(ap, int) == 1 ? TRUE : FALSE;
-    last_radio_contains_avg_channels = va_arg(ap, int) == 1 ? TRUE : FALSE;
-
-    va_end(ap);
+    mode = task_args[0];
+    SPI_PIN = task_args[1] == 1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
+    spi_was_interrupted = task_args[2] == 1 ? TRUE : FALSE;
+    last_radio_contains_avg_channels = task_args[3] == 1 ? TRUE : FALSE;
 
     return 0;
 }
@@ -258,22 +251,16 @@ int main_flybywire( void )
 
 #endif
 
-int init_test_ppm_task(int arg_count, ...) {
-    va_list ap;
-
+int init_test_ppm_task(int arg_count, int *task_args) {
     if(arg_count != 4) {
         printf("Horrible disaster for init_test_ppm_task, expected 4 arguments got %i\n", arg_count);
         return -1;
     }
 
-    va_start(ap, arg_count);
-
-    mode = va_arg(ap, int);
-    ppm_valid = va_arg(ap, int) == 1 ? TRUE : FALSE;
-    spi_was_interrupted = va_arg(ap, int) == 1 ? TRUE : FALSE;
-    last_radio_contains_avg_channels = va_arg(ap, int) == 1 ? TRUE : FALSE;
-
-    va_end(ap);
+    mode = task_args[0];
+    ppm_valid = task_args[1] == 1 ? TRUE : FALSE;
+    spi_was_interrupted = task_args[2] == 1 ? TRUE : FALSE;
+    last_radio_contains_avg_channels = task_args[3] == 1 ? TRUE : FALSE;
 
     return 0;
 }
@@ -312,25 +299,19 @@ void test_ppm_task(void)
     }
 }
 
-int init_check_failsafe_task(int arg_count, ...) {
-    va_list ap;
-
+int init_check_failsafe_task(int arg_count, int *task_args) {
     if(arg_count != 1) {
         printf("Horrible disaster for init_check_failsafe_task, expected 1 arguments got %i\n", arg_count);
         return -1;
     }
 
-    va_start(ap, arg_count);
-
-    if(va_arg(ap, int) == 1) {
+    if(task_args[0] == 1) {
         mode = MODE_MANUAL;
         radio_ok = FALSE;
     } else {
         mode = MODE_MANUAL;
         radio_ok = TRUE;
     }
-
-    va_end(ap);
 
     return 0;
 }
@@ -345,22 +326,17 @@ void check_failsafe_task(void)
     }
 }
 
-int init_check_mega128_values_task(int arg_count, ...) {
-    va_list ap;
+int init_check_mega128_values_task(int arg_count, int *task_args) {
 
     if(arg_count != 4) {
         printf("Horrible disaster for init_check_mega128_values_task, expected 4 arguments got %i\n", arg_count);
         return -1;
     }
 
-    va_start(ap, arg_count);
-
-    mode = va_arg(ap, int);
-    SPI_PIN = va_arg(ap, int) == 1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
-    spi_was_interrupted = va_arg(ap, int) == 1 ? TRUE : FALSE;
-    mega128_receive_valid = va_arg(ap, int) == 1 ? TRUE : FALSE;
-
-    va_end(ap);
+    mode = task_args[0];
+    SPI_PIN = task_args[1] == 1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
+    spi_was_interrupted = task_args[2] == 1 ? TRUE : FALSE;
+    mega128_receive_valid = task_args[3] == 1 ? TRUE : FALSE;
 
     return 0;
 }
