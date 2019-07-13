@@ -50,7 +50,7 @@ typedef struct task {
 } task;
 
 task _altitude_control_task = { .name = "altitude_control_task", .function = &altitude_control_task, .init = &init_altitude_control_task, .next_task = 0 };
-task _climb_control_task = { .name = "altitude_control_task", .function = &climb_control_task, .init = &init_climb_control_task, .next_task = &_altitude_control_task };
+task _climb_control_task = { .name = "climb_control_task", .function = &climb_control_task, .init = &init_climb_control_task, .next_task = &_altitude_control_task };
 task _link_fbw_send = { .name = "link_fbw_send", .function = &link_fbw_send, .init = &init_link_fbw_send, .next_task = &_climb_control_task };
 task _navigation_task = { .name = "navigation_task", .function = &navigation_task, .init = &init_navigation_task, .next_task = &_link_fbw_send };
 task _radio_control_task = { .name = "radio_control_task", .function = &radio_control_task, .init = &init_radio_control_task, .next_task = &_navigation_task };
